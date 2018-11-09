@@ -34,6 +34,8 @@
     "vue"
   ],
   "dependencies": {
+    "acorn": "^6.0.0",
+    "ajv": "^6.0.0",
     "vue": "2.3.3"
   },
   "devDependencies": {
@@ -49,7 +51,7 @@
     "chai": "^3.5.0",
     "css-loader": "^0.26.1",
     "file-loader": "^0.9.0",
-    "karma": "^0.13.22",
+    "karma": "^3.1.1",
     "karma-browserify": "^5.0.5",
     "karma-chrome-launcher": "^1.0.1",
     "karma-es6-shim": "^1.0.0",
@@ -58,7 +60,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-sinon-chai": "^1.2.4",
     "karma-source-map-support": "^1.1.0",
-    "mocha": "^2.4.5",
+    "mocha": "^5.2.0",
     "node-sass": "^4.8.3",
     "phantomjs-prebuilt": "^2.1.7",
     "rollup": "^0.31.2",
@@ -68,15 +70,15 @@
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-replace": "^1.1.1",
     "sass-loader": "^4.1.1",
-    "sinon": "^1.17.6",
+    "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.2",
     "vue-loader": "^10.0.2",
     "vue-style-loader": "^1.0.0",
     "vue-template-compiler": "2.3.3",
     "watchify": "^3.7.0",
-    "webpack": "^1.14.0",
-    "webpack-dev-server": "^1.16.2"
+    "webpack": "^2.2.0-rc.0",
+    "webpack-dev-server": "^3.1.10"
   },
   "author": "Taha Shashtari",
   "license": "MIT"

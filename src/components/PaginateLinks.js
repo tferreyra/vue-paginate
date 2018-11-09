@@ -59,9 +59,9 @@ export default {
       numberOfPages: 0,
       target: null,
       // users: [ ... ],
-      paginate: ['pagedUsers'],
-      paginationPer: 100,
-      paginationCurrentPage: 0
+      // paginate: ['pagedUsers'],
+      // paginationPer: 100,
+      // paginationCurrentPage: 0
     }
   },
   computed: {
@@ -272,7 +272,7 @@ function getSimpleLinks (vm, h) {
     on: {
       click: (e) => {
         e.preventDefault()
-        0
+        if (vm.currentPage != 0) 0
       }
     }
   }
@@ -280,19 +280,20 @@ function getSimpleLinks (vm, h) {
     on: {
       click: (e) => {
         e.preventDefault()
-        lastPage
+        if (vm.currentPage != lastPage) lastPage
       }
     }
   }
+
+  const firstListData = { class: ['first', vm.currentPage == 0 ? 'disabled' : ''] }
   const nextListData = { class: ['next', vm.currentPage >= lastPage ? 'disabled' : ''] }
   const prevListData = { class: ['prev', vm.currentPage <= 0 ? 'disabled' : ''] }
-  const firstListData = { class: ['first', vm.currentPage == 0 ? 'disabled' : ''] }
   const lastListData = { class: ['last', vm.currentPage == lastPage ? 'disabled' : ''] }
   const prevLink = h('li', prevListData, [h('a', prevData, vm.simple.prev)])
   const nextLink = h('li', nextListData, [h('a', nextData, vm.simple.next)])
   const firstLink = h('li', firstListData, [h('a', firstData, vm.simple.first)])
-  const lastLink = h('li', lastListData, [h('a', lasttData, vm.simple.last)])
-  return [prevLink, nextLink, firstLink, lastLink]
+  const lastLink = h('li', lastListData, [h('a', lastData, vm.simple.last)])
+  return [ firstLink, prevLink, nextLink, lastLink]
 }
 
 function getTargetPaginateComponent (children, targetName) {
@@ -309,17 +310,17 @@ function getListOfPageNumbers (numberOfPages) {
     .map((val, index) => index)
 }
 
-function getClassesForLink(link, currentPage, lastPage, { prev, next, first, last }) {
+function getClassesForLink(link, currentPage, lastPage, { first, prev, next, last }) {
   let liClass = []
-  if (link === prev) {
+  if (link === first) {
+    liClass.push(first) 
+  } else if (link === prev) {
     liClass.push('left-arrow')
   } else if (link === next) {
     liClass.push('right-arrow')
   } else if (link === ELLIPSES) {
     liClass.push('ellipses')
-  } else if (link === FIRST) {
-    liClass.push(first) 
-  } else if (link === LAST) {
+  } else if (link === last) {
     liClass.push(last)
   } else {
     liClass.push('number')
@@ -341,16 +342,16 @@ function getClassesForLink(link, currentPage, lastPage, { prev, next, first, las
   return liClass
 }
 
-function getTargetPageForLink (link, limit, currentPage, listOfPages, { prev, next, first, last }, metaData = null) {
+function getTargetPageForLink (link, limit, currentPage, listOfPages, { first, prev, next, last }, metaData = null) {
   let currentChunk = Math.floor(currentPage / limit)
-  if (link === prev) {
+  if (link === first) {
+    return 0 
+  } else if (link === prev) {
     return (currentPage - 1) < 0 ? 0 : currentPage - 1
   } else if (link === next) {
     return (currentPage + 1 > listOfPages.length - 1)
       ? listOfPages.length - 1
       : currentPage + 1
-  } else if (link === first) {
-    return 0 
   } else if (link === last) {
     return listOfPages.length - 1 
   } else if (metaData && metaData === 'right-ellipses') {
