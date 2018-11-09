@@ -146,7 +146,7 @@
     }
   }
 
-  var FIRST_ARROW = '<|'
+  var FIRST_ARROW = '|<'
   var LAST_ARROW = '>|'
   var ELLIPSES = '...'
   var LEFT_ARROW = '<'

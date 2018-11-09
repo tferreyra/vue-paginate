@@ -13,13 +13,17 @@
       :show-step-links="true"
       :limit="2"
       :step-links="{
+        first: 'F',
         next: 'N',
-        prev: 'P'
+        prev: 'P',
+        last: 'L'
       }"
     ></paginate-links>
     <paginate-links for="items" :simple="{
-      next: 'Next »',
-      prev: '« Back'
+      first: '|< First',
+      next: 'Next >',
+      prev: '< Back',
+      last: 'Last >|'
     }"></paginate-links>
     <span v-if="$refs.paginator">
       Viewing {{$refs.paginator.pageItemsCount}} results

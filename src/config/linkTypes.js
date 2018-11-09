@@ -1,4 +1,4 @@
-export const FIRST_ARROW = '<|'
+export const FIRST_ARROW = '|<'
 export const LAST_ARROW = '>|'
 export const ELLIPSES = '...'
 export const LEFT_ARROW = '<'

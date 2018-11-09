@@ -243,7 +243,7 @@ describe('PaginateLinks.vue', () => {
       it('can show step links for limited links', (done) => {
         Vue.nextTick(() => {
           expect(vm.$el.querySelector('.paginate-links').innerHTML).to.equal([
-            '<li class="first-arrow disabled"><a>&lt;|</a></li>',
+            '<li class="first-arrow disabled"><a>|&lt;</a></li>',
             '<li class="left-arrow disabled"><a>&lt;</a></li>',
             '<li class="number active"><a>1</a></li>',
             '<li class="number"><a>2</a></li>',
@@ -260,7 +260,7 @@ describe('PaginateLinks.vue', () => {
         vm.paginate.langs.page++
         Vue.nextTick(() => {
           expect(vm.$el.querySelector('.paginate-links').innerHTML).to.equal([
-            '<li class="first-arrow"><a>&lt;|</a></li>',
+            '<li class="first-arrow"><a>|&lt;</a></li>',
             '<li class="left-arrow"><a>&lt;</a></li>',
             '<li class="number"><a>1</a></li>',
             '<li class="number active"><a>2</a></li>',
@@ -277,7 +277,7 @@ describe('PaginateLinks.vue', () => {
         vm.paginate.langs.page = 7
         Vue.nextTick(() => {
           expect(vm.$el.querySelector('.paginate-links').innerHTML).to.equal([
-            '<li class="first-arrow"><a>&lt;|</a></li>',
+            '<li class="first-arrow"><a>|&lt;</a></li>',
             '<li class="left-arrow"><a>&lt;</a></li>',
             '<li class="number"><a>1</a></li>',
             '<li class="ellipses"><a>...</a></li>',
