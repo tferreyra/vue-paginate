@@ -1,5 +1,5 @@
 import LimitedLinksGenerator from '../util/LimitedLinksGenerator'
-import { LEFT_ARROW, RIGHT_ARROW, ELLIPSES } from '../config/linkTypes'
+import { LEFT_ARROW, RIGHT_ARROW, ELLIPSES, FIRST, LAST } from '../config/linkTypes'
 import { warn } from '../util/debug'
 
 export default {
@@ -17,7 +17,7 @@ export default {
       type: Object,
       default: null,
       validator (obj) {
-        return obj.prev && obj.next
+        return obj.prev && obj.next && obj.first && obj.last
       }
     },
     stepLinks: {
@@ -25,11 +25,13 @@ export default {
       default: () => {
         return {
           prev: LEFT_ARROW,
-          next: RIGHT_ARROW
+          next: RIGHT_ARROW,
+          first: FIRST,
+          last: LAST
         }
       },
       validator (obj) {
-        return obj.prev && obj.next
+        return obj.prev && obj.next && obj.first && obj.last
       }
     },
     showStepLinks: {
@@ -55,7 +57,11 @@ export default {
     return {
       listOfPages: [],
       numberOfPages: 0,
-      target: null
+      target: null,
+      // users: [ ... ],
+      paginate: ['pagedUsers'],
+      paginationPer: 100,
+      paginationCurrentPage: 0
     }
   },
   computed: {
@@ -74,6 +80,13 @@ export default {
       set (page) {
         this.state.page = page
       }
+    },
+    paginationFirstIndex () {
+      return this.paginationCurrentPage * this.paginationPer
+    },
+    paginationLastIndex () {
+      const nextIndex = Math.min((this.paginationCurrentPage * this.paginationPer) + this.paginationPer, this.users.length)
+      return Math.abs(nextIndex, 0)
     }
   },
   mounted () {
@@ -86,11 +99,23 @@ export default {
     if (this.simple && !this.simple.prev) {
       warn(`<paginate-links for="${this.for}"> 'simple' prop doesn't contain 'prev' value.`, this.parent)
     }
+    if (this.simple && !this.simple.first) {
+      warn(`<paginate-links for="${this.for}"> 'simple' prop doesn't contain 'first' value.`, this.parent)
+    }
+    if (this.simple && !this.simple.last) {
+      warn(`<paginate-links for="${this.for}"> 'simple' prop doesn't contain 'last' value.`, this.parent)
+    }
     if (this.stepLinks && !this.stepLinks.next) {
       warn(`<paginate-links for="${this.for}"> 'step-links' prop doesn't contain 'next' value.`, this.parent)
     }
     if (this.stepLinks && !this.stepLinks.prev) {
       warn(`<paginate-links for="${this.for}"> 'step-links' prop doesn't contain 'prev' value.`, this.parent)
+    }
+    if (this.stepLinks && !this.stepLinks.first) {
+      warn(`<paginate-links for="${this.for}"> 'step-links' prop doesn't contain 'first' value.`, this.parent)
+    }
+    if (this.stepLinks && !this.stepLinks.last) {
+      warn(`<paginate-links for="${this.for}"> 'step-links' prop doesn't contain 'last' value.`, this.parent)
     }
     this.$nextTick(() => {
       this.updateListOfPages()
@@ -104,10 +129,13 @@ export default {
       deep: true
     },
     currentPage (toPage, fromPage) {
-      this.$emit('change', toPage + 1, fromPage + 1)
+      this.$emit('change', toPage + 1, fromPage + 1, toFirst, toLast)
     }
   },
   methods: {
+    onPagedUsersChange (toPage, lastPage) {
+      this.paginationCurrentPage = toPage
+    },
     updateListOfPages () {
       this.target = getTargetPaginateComponent(this.parent.$children, this.for)
       if (!this.target) {
@@ -148,7 +176,7 @@ export default {
 
 function getFullLinks (vm, h) {
   const allLinks = vm.showStepLinks
-    ? [vm.stepLinks.prev, ...vm.listOfPages, vm.stepLinks.next]
+    ? [vm.stepLinks.first, vm.stepLinks.prev, ...vm.listOfPages, vm.stepLinks.next, vm.stepLinks.last]
     : vm.listOfPages
   return allLinks.map(link => {
     const data = {
@@ -171,7 +199,7 @@ function getFullLinks (vm, h) {
       vm.listOfPages.length - 1,
       vm.stepLinks
     )
-    const linkText = link === vm.stepLinks.next || link === vm.stepLinks.prev
+    const linkText = link === vm.stepLinks.next || link === vm.stepLinks.prev || link === vm.stepLinks.first || link === vm.stepLinks.last
       ? link
       : link + 1 // it means it's a number
     return h('li', { class: liClasses }, [h('a', data, linkText)])
@@ -187,7 +215,7 @@ function getLimitedLinks (vm, h) {
   ).generate()
 
   limitedLinks = vm.showStepLinks
-    ? [vm.stepLinks.prev, ...limitedLinks, vm.stepLinks.next]
+    ? [vm.stepLinks.first, vm.stepLinks.prev, ...limitedLinks, vm.stepLinks.next, vm.stepLinks.last]
     : limitedLinks
 
   const limitedLinksMetadata = getLimitedLinksMetadata(limitedLinks)
@@ -240,11 +268,31 @@ function getSimpleLinks (vm, h) {
       }
     }
   }
+  const firstData = {
+    on: {
+      click: (e) => {
+        e.preventDefault()
+        0
+      }
+    }
+  }
+  const lastData = {
+    on: {
+      click: (e) => {
+        e.preventDefault()
+        lastPage
+      }
+    }
+  }
   const nextListData = { class: ['next', vm.currentPage >= lastPage ? 'disabled' : ''] }
   const prevListData = { class: ['prev', vm.currentPage <= 0 ? 'disabled' : ''] }
+  const firstListData = { class: ['first', vm.currentPage == 0 ? 'disabled' : ''] }
+  const lastListData = { class: ['last', vm.currentPage == lastPage ? 'disabled' : ''] }
   const prevLink = h('li', prevListData, [h('a', prevData, vm.simple.prev)])
   const nextLink = h('li', nextListData, [h('a', nextData, vm.simple.next)])
-  return [prevLink, nextLink]
+  const firstLink = h('li', firstListData, [h('a', firstData, vm.simple.first)])
+  const lastLink = h('li', lastListData, [h('a', lasttData, vm.simple.last)])
+  return [prevLink, nextLink, firstLink, lastLink]
 }
 
 function getTargetPaginateComponent (children, targetName) {
@@ -261,7 +309,7 @@ function getListOfPageNumbers (numberOfPages) {
     .map((val, index) => index)
 }
 
-function getClassesForLink(link, currentPage, lastPage, { prev, next }) {
+function getClassesForLink(link, currentPage, lastPage, { prev, next, first, last }) {
   let liClass = []
   if (link === prev) {
     liClass.push('left-arrow')
@@ -269,6 +317,10 @@ function getClassesForLink(link, currentPage, lastPage, { prev, next }) {
     liClass.push('right-arrow')
   } else if (link === ELLIPSES) {
     liClass.push('ellipses')
+  } else if (link === FIRST) {
+    liClass.push(first) 
+  } else if (link === LAST) {
+    liClass.push(last)
   } else {
     liClass.push('number')
   }
@@ -281,11 +333,15 @@ function getClassesForLink(link, currentPage, lastPage, { prev, next }) {
     liClass.push('disabled')
   } else if (link === next && currentPage >= lastPage) {
     liClass.push('disabled')
+  } else if (link === first && currentPage == 0) {
+    liClass.push('disabled')
+  } else if (link === last && currentPage == lastPage) {
+    liClass.push('disabled')
   }
   return liClass
 }
 
-function getTargetPageForLink (link, limit, currentPage, listOfPages, { prev, next }, metaData = null) {
+function getTargetPageForLink (link, limit, currentPage, listOfPages, { prev, next, first, last }, metaData = null) {
   let currentChunk = Math.floor(currentPage / limit)
   if (link === prev) {
     return (currentPage - 1) < 0 ? 0 : currentPage - 1
@@ -293,6 +349,10 @@ function getTargetPageForLink (link, limit, currentPage, listOfPages, { prev, ne
     return (currentPage + 1 > listOfPages.length - 1)
       ? listOfPages.length - 1
       : currentPage + 1
+  } else if (link === first) {
+    return 0 
+  } else if (link === last) {
+    return listOfPages.length - 1 
   } else if (metaData && metaData === 'right-ellipses') {
     return (currentChunk + 1) * limit
   } else if (metaData && metaData === 'left-ellipses') {
