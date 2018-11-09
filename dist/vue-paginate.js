@@ -146,8 +146,8 @@
     }
   }
 
-  var FIRST = '<|'
-  var LAST = '>|'
+  var FIRST_ARROW = '<|'
+  var LAST_ARROW = '>|'
   var ELLIPSES = '...'
   var LEFT_ARROW = '<'
   var RIGHT_ARROW = '>'
@@ -216,21 +216,21 @@
         type: Object,
         default: null,
         validator: function validator (obj) {
-          return obj.prev && obj.next && obj.first && obj.last
+          return obj.first && obj.prev && obj.next && obj.last
         }
       },
       stepLinks: {
         type: Object,
         default: function () {
           return {
+            first: FIRST_ARROW,
             prev: LEFT_ARROW,
             next: RIGHT_ARROW,
-            first: FIRST,
-            last: LAST
+            last: LAST_ARROW
           }
         },
         validator: function validator$1 (obj) {
-          return obj.prev && obj.next && obj.first && obj.last
+          return obj.first && obj.prev && obj.next && obj.last
         }
       },
       showStepLinks: {
@@ -258,9 +258,9 @@
         numberOfPages: 0,
         target: null,
         // users: [ ... ],
-        paginate: ['pagedUsers'],
-        paginationPer: 100,
-        paginationCurrentPage: 0
+        // paginate: ['pagedUsers'],
+        // paginationPer: 100,
+        // paginationCurrentPage: 0
       }
     },
     computed: {
@@ -330,13 +330,13 @@
         deep: true
       },
       currentPage: function currentPage (toPage, fromPage) {
-        this.$emit('change', toPage + 1, fromPage + 1, toFirst, toLast)
+        this.$emit('change', toPage + 1, fromPage + 1)
       }
     },
     methods: {
-      onPagedUsersChange: function onPagedUsersChange (toPage, lastPage) {
-        this.paginationCurrentPage = toPage
-      },
+      // onPagedUsersChange (toPage, lastPage) {
+      //   this.paginationCurrentPage = toPage
+      // },
       updateListOfPages: function updateListOfPages () {
         this.target = getTargetPaginateComponent(this.parent.$children, this.for)
         if (!this.target) {
@@ -487,15 +487,16 @@
         }
       }
     }
+
+    var firstListData = { class: ['first', vm.currentPage == 0 ? 'disabled' : ''] }
     var nextListData = { class: ['next', vm.currentPage >= lastPage ? 'disabled' : ''] }
     var prevListData = { class: ['prev', vm.currentPage <= 0 ? 'disabled' : ''] }
-    var firstListData = { class: ['first', vm.currentPage == 0 ? 'disabled' : ''] }
     var lastListData = { class: ['last', vm.currentPage == lastPage ? 'disabled' : ''] }
     var prevLink = h('li', prevListData, [h('a', prevData, vm.simple.prev)])
     var nextLink = h('li', nextListData, [h('a', nextData, vm.simple.next)])
     var firstLink = h('li', firstListData, [h('a', firstData, vm.simple.first)])
     var lastLink = h('li', lastListData, [h('a', lastData, vm.simple.last)])
-    return [prevLink, nextLink, firstLink, lastLink]
+    return [ firstLink, prevLink, nextLink, lastLink]
   }
 
   function getTargetPaginateComponent (children, targetName) {
@@ -513,22 +514,22 @@
   }
 
   function getClassesForLink(link, currentPage, lastPage, ref) {
+    var first = ref.first;
     var prev = ref.prev;
     var next = ref.next;
-    var first = ref.first;
     var last = ref.last;
 
     var liClass = []
-    if (link === prev) {
+    if (link === first) {
+      liClass.push('first-arrow') 
+    } else if (link === prev) {
       liClass.push('left-arrow')
     } else if (link === next) {
       liClass.push('right-arrow')
     } else if (link === ELLIPSES) {
       liClass.push('ellipses')
-    } else if (link === FIRST) {
-      liClass.push(first) 
-    } else if (link === LAST) {
-      liClass.push(last)
+    } else if (link === last) {
+      liClass.push('last-arrow')
     } else {
       liClass.push('number')
     }
@@ -550,21 +551,21 @@
   }
 
   function getTargetPageForLink (link, limit, currentPage, listOfPages, ref, metaData) {
+    var first = ref.first;
     var prev = ref.prev;
     var next = ref.next;
-    var first = ref.first;
     var last = ref.last;
     if ( metaData === void 0 ) metaData = null;
 
     var currentChunk = Math.floor(currentPage / limit)
-    if (link === prev) {
+    if (link === first) {
+      return 0 
+    } else if (link === prev) {
       return (currentPage - 1) < 0 ? 0 : currentPage - 1
     } else if (link === next) {
       return (currentPage + 1 > listOfPages.length - 1)
         ? listOfPages.length - 1
         : currentPage + 1
-    } else if (link === first) {
-      return 0 
     } else if (link === last) {
       return listOfPages.length - 1 
     } else if (metaData && metaData === 'right-ellipses') {

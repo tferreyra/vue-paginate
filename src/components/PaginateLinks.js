@@ -1,5 +1,5 @@
 import LimitedLinksGenerator from '../util/LimitedLinksGenerator'
-import { LEFT_ARROW, RIGHT_ARROW, ELLIPSES, FIRST, LAST } from '../config/linkTypes'
+import { LEFT_ARROW, RIGHT_ARROW, ELLIPSES, FIRST_ARROW, LAST_ARROW } from '../config/linkTypes'
 import { warn } from '../util/debug'
 
 export default {
@@ -17,21 +17,21 @@ export default {
       type: Object,
       default: null,
       validator (obj) {
-        return obj.prev && obj.next && obj.first && obj.last
+        return obj.first && obj.prev && obj.next && obj.last
       }
     },
     stepLinks: {
       type: Object,
       default: () => {
         return {
+          first: FIRST_ARROW,
           prev: LEFT_ARROW,
           next: RIGHT_ARROW,
-          first: FIRST,
-          last: LAST
+          last: LAST_ARROW
         }
       },
       validator (obj) {
-        return obj.prev && obj.next && obj.first && obj.last
+        return obj.first && obj.prev && obj.next && obj.last
       }
     },
     showStepLinks: {
@@ -129,13 +129,13 @@ export default {
       deep: true
     },
     currentPage (toPage, fromPage) {
-      this.$emit('change', toPage + 1, fromPage + 1, toFirst, toLast)
+      this.$emit('change', toPage + 1, fromPage + 1)
     }
   },
   methods: {
-    onPagedUsersChange (toPage, lastPage) {
-      this.paginationCurrentPage = toPage
-    },
+    // onPagedUsersChange (toPage, lastPage) {
+    //   this.paginationCurrentPage = toPage
+    // },
     updateListOfPages () {
       this.target = getTargetPaginateComponent(this.parent.$children, this.for)
       if (!this.target) {
@@ -313,7 +313,7 @@ function getListOfPageNumbers (numberOfPages) {
 function getClassesForLink(link, currentPage, lastPage, { first, prev, next, last }) {
   let liClass = []
   if (link === first) {
-    liClass.push(first) 
+    liClass.push('first-arrow') 
   } else if (link === prev) {
     liClass.push('left-arrow')
   } else if (link === next) {
@@ -321,7 +321,7 @@ function getClassesForLink(link, currentPage, lastPage, { first, prev, next, las
   } else if (link === ELLIPSES) {
     liClass.push('ellipses')
   } else if (link === last) {
-    liClass.push(last)
+    liClass.push('last-arrow')
   } else {
     liClass.push('number')
   }

@@ -1,5 +1,5 @@
-export const FIRST = '<|'
-export const LAST = '>|'
+export const FIRST_ARROW = '<|'
+export const LAST_ARROW = '>|'
 export const ELLIPSES = '...'
 export const LEFT_ARROW = '<'
 export const RIGHT_ARROW = '>'
